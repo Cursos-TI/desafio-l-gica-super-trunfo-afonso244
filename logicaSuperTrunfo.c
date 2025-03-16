@@ -1,8 +1,10 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 
-// Definição da estrutura para armazenar os atributos de cada cidade
+// Definição da estrutura Cidade
 typedef struct {
-    char estado[2];
+    char estado[3];
     char codigo[50];
     char nome[50];
     int populacao;
@@ -16,155 +18,93 @@ typedef struct {
 
 void exibir_menu() {
     printf("\nEscolha um atributo para comparar:\n");
-    printf("1 - População\n");
-    printf("2 - Área\n");
+    printf("1 - Populacao\n");
+    printf("2 - Area\n");
     printf("3 - PIB\n");
-    printf("4 - Número de pontos turísticos\n");
-    printf("5 - Densidade demográfica\n");
-    printf("Digite sua escolha: ");
+    printf("4 - Pontos Turisticos\n");
+    printf("5 - Densidade Demografica\n");
 }
 
-void exibir_atributos(Cidade cidade) {
-    printf("\n==================================\n");
-    printf("       Atributos da Cidade       \n");
-    printf("==================================\n");
-    printf("Estado: %s\n", cidade.estado);
-    printf("Código: %s\n", cidade.codigo);
-    printf("Nome: %s\n", cidade.nome);
-    printf("População: %d habitantes\n", cidade.populacao);
-    printf("Área: %.2f km²\n", cidade.area);
-    printf("PIB: %.2f bilhões de reais\n", cidade.pib);
-    printf("Número de Pontos Turísticos: %d\n", cidade.pontos_turisticos);
-    printf("PIB per Capita: %.2f\n", cidade.pib_per_capita);
-    printf("Densidade: %.2f habitantes/km²\n", cidade.densidade);
-    printf("Super Poder: %.2f\n", cidade.superpoder);
-    printf("==================================\n");
+void gerar_cidade_aleatoria(Cidade *cidade) {
+    // Gerando dados aleatórios para a cidade
+    cidade->populacao = rand() % 20000000 + 1000000;  // População entre 1M e 20M
+    cidade->area = (rand() % 5000) + 100.0;  // Área entre 100 e 5000 km²
+    cidade->pib = (rand() % 100000) + 1000.0;  // PIB entre 1000 e 100000 milhões
+    cidade->pontos_turisticos = rand() % 100 + 1;  // Pontos turísticos entre 1 e 100
+    cidade->pib_per_capita = cidade->pib / cidade->populacao;  // PIB per capita
+    cidade->densidade = cidade->populacao / cidade->area;  // Densidade demográfica
+    cidade->superpoder = rand() % 100 + 1;  // Superpoder entre 1 e 100
 }
 
-void comparar_cidades(Cidade cidade1, Cidade cidade2, int escolha) {
-    switch (escolha) {
-        case 1: // Comparar População
-            printf("\nComparando População:\n");
-            printf("%s: %d habitantes\n", cidade1.nome, cidade1.populacao);
-            printf("%s: %d habitantes\n", cidade2.nome, cidade2.populacao);
-            if (cidade1.populacao > cidade2.populacao)
-                printf("Vencedor: %s\n", cidade1.nome);
-            else if (cidade1.populacao < cidade2.populacao)
-                printf("Vencedor: %s\n", cidade2.nome);
-            else
-                printf("Empate!\n");
-            break;
-
-        case 2: // Comparar Área
-            printf("\nComparando Área:\n");
-            printf("%s: %.2f km²\n", cidade1.nome, cidade1.area);
-            printf("%s: %.2f km²\n", cidade2.nome, cidade2.area);
-            if (cidade1.area > cidade2.area)
-                printf("Vencedor: %s\n", cidade1.nome);
-            else if (cidade1.area < cidade2.area)
-                printf("Vencedor: %s\n", cidade2.nome);
-            else
-                printf("Empate!\n");
-            break;
-
-        case 3: // Comparar PIB
-            printf("\nComparando PIB:\n");
-            printf("%s: %.2f bilhões de reais\n", cidade1.nome, cidade1.pib);
-            printf("%s: %.2f bilhões de reais\n", cidade2.nome, cidade2.pib);
-            if (cidade1.pib > cidade2.pib)
-                printf("Vencedor: %s\n", cidade1.nome);
-            else if (cidade1.pib < cidade2.pib)
-                printf("Vencedor: %s\n", cidade2.nome);
-            else
-                printf("Empate!\n");
-            break;
-
-        case 4: // Comparar Pontos Turísticos
-            printf("\nComparando Pontos Turísticos:\n");
-            printf("%s: %d pontos turísticos\n", cidade1.nome, cidade1.pontos_turisticos);
-            printf("%s: %d pontos turísticos\n", cidade2.nome, cidade2.pontos_turisticos);
-            if (cidade1.pontos_turisticos > cidade2.pontos_turisticos)
-                printf("Vencedor: %s\n", cidade1.nome);
-            else if (cidade1.pontos_turisticos < cidade2.pontos_turisticos)
-                printf("Vencedor: %s\n", cidade2.nome);
-            else
-                printf("Empate!\n");
-            break;
-
-        case 5: // Comparar Densidade Demográfica (menor valor vence)
-            printf("\nComparando Densidade Demográfica:\n");
-            printf("%s: %.2f habitantes/km²\n", cidade1.nome, cidade1.densidade);
-            printf("%s: %.2f habitantes/km²\n", cidade2.nome, cidade2.densidade);
-            if (cidade1.densidade < cidade2.densidade)
-                printf("Vencedor: %s\n", cidade1.nome);
-            else if (cidade1.densidade > cidade2.densidade)
-                printf("Vencedor: %s\n", cidade2.nome);
-            else
-                printf("Empate!\n");
-            break;
-
-        default:
-            printf("Opção inválida! Escolha um número entre 1 e 5.\n");
+void comparar_cidades(Cidade cidade1, Cidade cidade2, int atributo1, int atributo2) {
+    float valor1_c1, valor1_c2, valor2_c1, valor2_c2;
+    
+    // Determina os valores dos atributos escolhidos
+    switch (atributo1) {
+        case 1: valor1_c1 = cidade1.populacao; valor1_c2 = cidade2.populacao; break;
+        case 2: valor1_c1 = cidade1.area; valor1_c2 = cidade2.area; break;
+        case 3: valor1_c1 = cidade1.pib; valor1_c2 = cidade2.pib; break;
+        case 4: valor1_c1 = cidade1.pontos_turisticos; valor1_c2 = cidade2.pontos_turisticos; break;
+        case 5: valor1_c1 = cidade1.populacao / cidade1.area; valor1_c2 = cidade2.populacao / cidade2.area; break;
     }
+    
+    switch (atributo2) {
+        case 1: valor2_c1 = cidade1.populacao; valor2_c2 = cidade2.populacao; break;
+        case 2: valor2_c1 = cidade1.area; valor2_c2 = cidade2.area; break;
+        case 3: valor2_c1 = cidade1.pib; valor2_c2 = cidade2.pib; break;
+        case 4: valor2_c1 = cidade1.pontos_turisticos; valor2_c2 = cidade2.pontos_turisticos; break;
+        case 5: valor2_c1 = cidade1.populacao / cidade1.area; valor2_c2 = cidade2.populacao / cidade2.area; break;
+    }
+    
+    // Exibe os valores
+    printf("\nComparacao entre %s e %s:\n", cidade1.nome, cidade2.nome);
+    printf("Atributo 1: Cidade 1 = %.2f, Cidade 2 = %.2f\n", valor1_c1, valor1_c2);
+    printf("Atributo 2: Cidade 1 = %.2f, Cidade 2 = %.2f\n", valor2_c1, valor2_c2);
+    
+    // Soma os atributos
+    float soma_c1 = valor1_c1 + valor2_c1;
+    float soma_c2 = valor1_c2 + valor2_c2;
+    
+    printf("Soma dos atributos: Cidade 1 = %.2f, Cidade 2 = %.2f\n", soma_c1, soma_c2);
+    
+    // Determina o vencedor
+    if (soma_c1 > soma_c2)
+        printf("VOCÊ VENCEU!!: %s\n", cidade1.nome);
+    else if (soma_c1 < soma_c2)
+        printf("VOCÊ PERDEU!!: %s\n", cidade2.nome);
+    else
+        printf("Empate!\n");
 }
 
 int main() {
-    Cidade cidade1, cidade2;
-    int escolha;
+    srand(time(0));  // Inicializa o gerador de números aleatórios
+    
+    Cidade cidade1 = {"SP", "A01", "Sao Paulo", 0, 0.0, 0.0, 0, 0.0, 0.0, 0};
+    Cidade cidade2 = {"RJ", "B02", "Rio de Janeiro", 0, 0.0, 0.0, 0, 0.0, 0.0, 0};
+    
+    // Gerar cidades aleatórias
+    gerar_cidade_aleatoria(&cidade1);
+    gerar_cidade_aleatoria(&cidade2);
+    
+    // Exemplo de nomes para as cidades
+    printf("Cidade 1: %s, Estado: %s\n", cidade1.nome, cidade1.estado);
+    printf("Cidade 2: %s, Estado: %s\n", cidade2.nome, cidade2.estado);
 
-    // Cadastro da primeira cidade
-    printf("\n--- Cadastro da Primeira Cidade ---\n");
-    printf("Digite o estado da primeira cidade (A-H): ");
-    scanf(" %s", cidade1.estado);
-    printf("Digite o código da primeira cidade (Ex: A01): ");
-    scanf(" %s", cidade1.codigo);
-    printf("Digite o nome da cidade: ");
-    scanf(" %s", cidade1.nome);
-    printf("Digite a população da cidade: ");
-    scanf("%d", &cidade1.populacao);
-    printf("Digite a área da cidade em km²: ");
-    scanf("%f", &cidade1.area);
-    printf("Digite o PIB da cidade em bilhões: ");
-    scanf("%f", &cidade1.pib);
-    printf("Digite o número de pontos turísticos: ");
-    scanf("%d", &cidade1.pontos_turisticos);
-
-    cidade1.pib_per_capita = cidade1.pib / cidade1.populacao;
-    cidade1.densidade = cidade1.populacao / cidade1.area;
-    cidade1.superpoder = cidade1.populacao + cidade1.area + cidade1.pib + cidade1.pontos_turisticos + cidade1.pib_per_capita + (1 / cidade1.densidade);
-
-    // Cadastro da segunda cidade
-    printf("\n--- Cadastro da Segunda Cidade ---\n");
-    printf("Digite o estado da segunda cidade (A-H): ");
-    scanf(" %s", cidade2.estado);
-    printf("Digite o código da segunda cidade (Ex: B02): ");
-    scanf(" %s", cidade2.codigo);
-    printf("Digite o nome da cidade: ");
-    scanf(" %s", cidade2.nome);
-    printf("Digite a população da cidade: ");
-    scanf("%f", &cidade2.populacao);
-    printf("Digite a área da cidade em km²: ");
-    scanf("%f", &cidade2.area);
-    printf("Digite o PIB da cidade em bilhões: ");
-    scanf("%f", &cidade2.pib);
-    printf("Digite o número de pontos turísticos: ");
-    scanf("%d", &cidade2.pontos_turisticos);
-
-    cidade2.pib_per_capita = cidade2.pib / cidade2.populacao;
-    cidade2.densidade = cidade2.populacao / cidade2.area;
-    cidade2.superpoder = cidade2.populacao + cidade2.area + cidade2.pib + cidade2.pontos_turisticos + cidade2.pib_per_capita + (1 / cidade2.densidade);
-
-    // Exibir atributos de ambas as cidades
-    printf("\n--- Atributos da Primeira Cidade ---\n");
-    exibir_atributos(cidade1);
-
-    printf("\n--- Atributos da Segunda Cidade ---\n");
-    exibir_atributos(cidade2);
-
-    // Exibir menu e comparar as cartas
+    int escolha1, escolha2;
+    
+    // Menu para escolher o primeiro atributo
     exibir_menu();
-    scanf("%d", &escolha);
-    comparar_cidades(cidade1, cidade2, escolha);
-
+    printf("Escolha o primeiro atributo: ");
+    scanf("%d", &escolha1);
+    
+    do {
+        exibir_menu();
+        printf("Escolha o segundo atributo (diferente do primeiro): ");
+        scanf("%d", &escolha2);
+    } while (escolha1 == escolha2);
+    
+    comparar_cidades(cidade1, cidade2, escolha1, escolha2);
+    
     return 0;
 }
+
